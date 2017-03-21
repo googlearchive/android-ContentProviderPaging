@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 'android-O'
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId "com.example.android.contentproviderpaging"
+        minSdkVersion 'O'
+        targetSdkVersion 'O'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    dependencies {
+        compile 'com.android.support:appcompat-v7:25.3.0'
+        compile 'com.android.support:recyclerview-v7:25.3.0'
+        compile 'com.github.bumptech.glide:glide:3.7.0'
+        testCompile 'junit:junit:4.12'
+    }
+}
