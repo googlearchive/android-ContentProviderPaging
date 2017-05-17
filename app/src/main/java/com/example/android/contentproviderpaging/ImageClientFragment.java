@@ -36,8 +36,6 @@ import android.widget.Toast;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.example.android.contentproviderpaging.ImageProvider.EXTRA_TOTAL_SIZE;
-
 /**
  * Fragment that works as a client for accessing the DocumentsProvider
  * ({@link ImageProvider}.
@@ -139,7 +137,7 @@ public class ImageClientFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             Bundle extras = cursor.getExtras();
-            int totalSize = extras.getInt(EXTRA_TOTAL_SIZE);
+            int totalSize = extras.getInt(ContentResolver.EXTRA_TOTAL_SIZE);
             mAdapter.setTotalSize(totalSize);
             int beforeCount = mAdapter.getFetchedItemCount();
             while (cursor.moveToNext()) {

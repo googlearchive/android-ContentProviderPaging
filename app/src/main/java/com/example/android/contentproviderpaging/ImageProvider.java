@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * ContentProvider that demonstrates how the paging support works introduced in Android O.
@@ -50,11 +51,6 @@ public class ImageProvider extends ContentProvider {
     private static final int IMAGE_ID = 2;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
-    // The key name for the value that indicates the total size in a Cursor object.
-    // The value should indicate the total number of the items even if the Cursor only has the part
-    // of the data set by specifying the offset and limit.
-    static final String EXTRA_TOTAL_SIZE = "extra_total_size";
 
     static {
         sUriMatcher.addURI(ImageContract.AUTHORITY, "images", IMAGES);
@@ -102,10 +98,16 @@ public class ImageProvider extends ContentProvider {
         MatrixCursor result = new MatrixCursor(resolveDocumentProjection(projection));
 
         File[] files = mBaseDir.listFiles();
-        int offset = queryArgs.getInt(ContentResolver.QUERY_ARG_OFFSET);
-        int limit = queryArgs.getInt(ContentResolver.QUERY_ARG_LIMIT);
+        int offset = queryArgs.getInt(ContentResolver.QUERY_ARG_OFFSET, 0);
+        int limit = queryArgs.getInt(ContentResolver.QUERY_ARG_LIMIT, Integer.MAX_VALUE);
         Log.d(TAG, "queryChildDocuments with Bundle, Uri: " +
                 uri + ", offset: " + offset + ", limit: " + limit);
+        if (offset < 0) {
+            throw new IllegalArgumentException("Offset must not be less than 0");
+        }
+        if (limit < 0) {
+            throw new IllegalArgumentException("Limit must not be less than 0");
+        }
 
         if (offset >= files.length) {
             return result;
@@ -116,7 +118,19 @@ public class ImageProvider extends ContentProvider {
         }
 
         Bundle bundle = new Bundle();
-        bundle.putInt(EXTRA_TOTAL_SIZE, files.length);
+        bundle.putInt(ContentResolver.EXTRA_TOTAL_SIZE, files.length);
+        String[] honoredArgs = new String[2];
+        int size = 0;
+        if (queryArgs.containsKey(ContentResolver.QUERY_ARG_OFFSET)) {
+            honoredArgs[size++] = ContentResolver.QUERY_ARG_OFFSET;
+        }
+        if (queryArgs.containsKey(ContentResolver.QUERY_ARG_LIMIT)) {
+            honoredArgs[size++] = ContentResolver.QUERY_ARG_LIMIT;
+        }
+        if (size != honoredArgs.length) {
+            honoredArgs = Arrays.copyOf(honoredArgs, size);
+        }
+        bundle.putStringArray(ContentResolver.EXTRA_HONORED_ARGS, honoredArgs);
         result.setExtras(bundle);
         return result;
     }

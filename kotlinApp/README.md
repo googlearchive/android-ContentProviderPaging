@@ -1,5 +1,4 @@
-
-Android ContentProviderPaging Sample
+Android ContentProviderPaging Sample (Kotlin)
 ===================================
 
 This sample demonstrates how to use the ContentProvider with paging support introduced
